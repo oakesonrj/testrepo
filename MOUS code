@@ -1,0 +1,66 @@
+from mne.minimum_norm import make_inverse_operator, apply_inverse
+import mne
+import mne_bids
+import numpy as np
+import os
+
+os.environ['SUBJECTS_DIR']='/data/MEGLANG/derivatives/freesurfer/subjects/'
+
+bids_path = mne_bids.BIDSPath(
+subject='A2021',
+session=None,
+task='auditory',
+datatype="meg",
+root='/data/MEGLANG/MOUS/BIDS/')
+
+raw = mne_bids.read_raw_bids(bids_path)
+raw.load_data()
+raw.notch_filter([50,100,150,200],n_jobs = 4)
+raw.filter(0.5, 55, n_jobs=4)
+
+events, evt_id=mne.events_from_annotations(raw)
+
+#epo = mne.Epochs(raw, events=events, event_id=255, tmin=-0.4, tmax=1.5, picks="meg")
+#epo.apply_baseline(baseline=(-0.2, 0))
+
+#evoked = epo.average(by_event_type=False)
+#evoked.plot()
+
+titleList = [] # empty list
+selIDList = []
+
+for key,value in evt_id.items():
+if key.find('Audio') >-1 or key.find('target')>-1 or key.find('WOORDEN')>-1 or key.find('ZINNEN')>-1 :
+titleList.append(key)
+selIDList.append(value)
+
+#print(titleList)
+#print(selIDList)
+
+epo2 = mne.Epochs(raw, events=events, event_id=selIDList, tmin=-0.4, tmax=1.5, picks="meg")
+epo2.apply_baseline(baseline=(-0.2, 0))
+evoked2 = epo2.average(by_event_type=True)
+#epo = mne.Epochs(raw, events=evts, event_id=selIDList, tmin=-0.2, tmax=0.6)
+#print(evoked)
+#print(evoked2)
+#evoked2[0,1].plot()
+
+#events[:65,:]
+
+new_evt_id = {title: id for title,id in zip(titleList,selIDList)}
+
+report = mne.Report(title='Events example')
+
+for i in range(len(evoked2)):
+      fig_joint = evoked2[i].plot_joint(times=[.4,.6,.7])
+      report.add_figure(fig_joint, title=titleList[i])#,n_time_points=10)
+
+ev_combo = mne.combine_evoked([evoked2[1], evoked2[3]], weights= -1, 1])
+ev_combo.plot_joint(times=[.4,.6,.7])
+
+N = 500 # choose a convenient number
+fig = mne.viz.plot_events(events[:N,:], sfreq=raw.info['sfreq'], first_samp=raw.first_samp, event_id=new_evt_id)
+
+report.add_figure(fig_evt, title='events')
+
+report.save("/data/MEGLANG/MOUS/BIDS/derivatives/NIMHMEGCORE/sub-A2021_report.html",open_browser=False,overwrite=True)
