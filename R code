@@ -1,24 +1,29 @@
-###RStudio Correlation code###
+###Correlation###
 
-library(ggplot2) library(dplyr) library(broom) library(ggpubr)
+library(ggplot2) 
+library(dplyr) 
+library(broom) 
+library(ggpubr)
+library(tidyverse)
+library(AICcmodavg)
 
 #import data in .csv, make sure of headers
 
 hist(data$variable) # for distribution of normality
 
-plot(variable.y ~ variable.x, data =data) # for linearity
+plot(variable.y ~ variable.x, data =dataset) # for linearity
 
 ###mulitple regression### 
 cor(data$variable1, data$variable2) # for independence of observations
 
 #create linear model from data 
-title.lm <- lm(variable.y ~ variable.x, data = data) summary(title.lm) # for reportable stats
+title.lm <- lm(variable.y ~ variable.x, data = dataset) summary(title.lm) # for reportable stats
 
 #check of homoscedasticity 
 par(mfrow=c(2,2)) # make plots easier to view 
 plot(title.lm)
 
-###plotting### 
+#plotting
 title.data.graph <- ggplot(data, aes(x=x variable, y=y variable)) + geom_point() 
 title.data.graph <- title.data.graph + geom_smooth(method="lm", col="red")
 
@@ -27,3 +32,27 @@ title.data.graph <- title.data.graph + stat_regline_equation(label.x = number, l
 income.graph + theme_bw() + labs(title = "Graph Title", x = "x axis label", y = "y axis label")
 
 title.data.graph
+
+
+
+###Independent Sample T Test###
+t.test(y ~ x, var.equal=TRUE, data=dataset)
+
+
+
+
+###ANOVA###
+one.way <- aov(SRT ~ Group, data = ttest1)
+
+two.way <- aov(SRT ~ Group + Age, data = ttest1)
+interaction <- aov(SRT ~ Group*Age, data=ttest1)
+summary(interaction)
+
+model.set <- list(one.way, two.way, interaction)
+model.names <- c("one.way", "two.way", "interaction")
+aictab(model.set, modnames = model.names)
+
+par(mfrow=c(2,2))
+plot(two.way)
+
+tukey.two.way<-TukeyHSD(two.way)
