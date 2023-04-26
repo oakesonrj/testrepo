@@ -48,6 +48,9 @@ two.way <- aov(SRT ~ Group + Age, data = ttest1)
 interaction <- aov(SRT ~ Group*Age, data=ttest1)
 summary(interaction)
 
+##adding another variable: variable.3.name <- aov(variable.y ~ variable.x + variably.2 + variable.3, data = data)
+#summary(blocking)
+
 model.set <- list(one.way, two.way, interaction)
 model.names <- c("one.way", "two.way", "interaction")
 aictab(model.set, modnames = model.names)
@@ -55,4 +58,24 @@ aictab(model.set, modnames = model.names)
 par(mfrow=c(2,2))
 plot(two.way)
 
-tukey.two.way<-TukeyHSD(two.way)
+mean.y.variable.data <- .data %>%
+     group_by(variable.x, variable.z) %>%
+     summarize(
+         y.variable = mean(y)
+     )
+
+mean.y.data$group <- c("a","b","c","n")
+
+mean.y.data
+
+two.way.plot <- ggplot(data, aes(x = x.variable, y = y.variable, group=z.variable)) +
+  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0))
+
+two.way.plot
+
+two.way.plot <- two.way.plot +
+  stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+  stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+  geom_point(data=mean.y.variable.data, aes(x=x.variable, y=y.variable))
+
+two.way.plot
