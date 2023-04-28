@@ -69,7 +69,7 @@ mean.y.data$group <- c("a","b","c","n")
 mean.y.data
 
 two.way.plot <- ggplot(data, aes(x = x.variable, y = y.variable, group=z.variable)) +
-  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0))
+  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0)) #+ xlim(n,n)
 
 two.way.plot
 
@@ -77,5 +77,19 @@ two.way.plot <- two.way.plot +
   stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
   stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
   geom_point(data=mean.y.variable.data, aes(x=x.variable, y=y.variable))
+
+two.way.plot
+
+two.way.plot <- two.way.plot +
+  geom_text(data=mean.y.variable.data, label=mean.y.variable.data$group, vjust = -8, size = 5) +
+  facet_wrap(~ z.variable)
+
+two.way.plot
+
+two.way.plot <- two.way.plot +
+  theme_classic2() +
+  labs(title = "Title",
+      x = "x label (1=..., 2=...)",
+      y = "Y label (...)")
 
 two.way.plot
