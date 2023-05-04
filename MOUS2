@@ -1,0 +1,18 @@
+from mne import read_source_estimate
+
+subjects_dir = "Z:/derivatives/freesurfer/subjects"# top directory of where all freesurfer reconstructions are located
+fname_stc = "Z:/derivatives/MOUS_targ#/sub-A2007/meg/sub-A2007_task-auditory_all-lh.stc"# file name (and path) of the stc file to be loaded
+#fname_stc = "Z:/derivatives/MOUS_targ#/sub-A2008/meg/sub-A2008_task-auditory_target2FSave-lh.stc"
+subject = "sub-A2007" # subject ID "sub-A2008"
+#subject = "fsaverage" # for FSAVE files
+stc = read_source_estimate(fname_stc, subject=subject)
+
+# Define plotting parameters
+surfer_kwargs = dict(
+    hemi='rh', subjects_dir=subjects_dir,
+    clim=dict(kind='value', lims=[8, 12, 15]), views='lateral',
+    initial_time=0.09, time_unit='s', size=(800, 800),
+    smoothing_steps=5)
+
+# Plot surface
+brain = stc.plot(**surfer_kwargs)
