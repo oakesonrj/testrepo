@@ -16,3 +16,58 @@ surfer_kwargs = dict(
 
 # Plot surface
 brain = stc.plot(**surfer_kwargs)
+
+
+# Epochs
+
+bids_path = mne_bids.BIDSPath(
+subject='A2021',
+session=None,
+task='auditory',
+datatype="meg",
+root='Z:/') ### root for biowulf: '/data/MEGLANG/MOUS/BIDS/'
+print('file path', bids_path.fpath)
+sub_list=["A2021", "A2024", "A2025"]
+
+for i in range(len(sub_list)):
+    #print(sub_list[i],i)
+    bids_path.update(subject=sub_list[i])
+    print('file path', bids_path.fpath)
+    raw = mne_bids.read_raw_bids(bids_path)
+    #### next portion requires biowulf
+    raw.load_data()
+    
+    
+    events, evt_id=mne.events_from_annotations(raw)
+    
+    titleList = [] # empty list
+    selIDList = []
+    
+    for key,value in evt_id.items():
+          if key.find('Audio') >-1 or key.find('target')>-1 or key.find('WOORDEN')>-1 or key.find('ZINNEN')>-1 :
+              titleList.append(key)
+              selIDList.append(value)
+    
+    epo = mne.Epochs(raw, events=events, event_id=selIDList, tmin=-0.4, tmax=1.5, picks="meg")
+    epo.apply_baseline(baseline=(-0.2, 0))
+    evoked = epo.average(by_event_type=True)
+    
+    new_evt_id = {title: id for title,id in zip(titleList,selIDList)}
+
+    report = mne.Report(title='Events example')
+
+    for i in range(len(evoked)):
+        fig_joint = evoked[i].plot_joint(times=[.4,.6,.7])
+        report.add_figure(fig_joint, title=titleList[i])#,n_time_points=10)
+
+    ev_combo = mne.combine_evoked([evoked[1], evoked[3]], weights= -1, 1])
+    ev_combo.plot_joint(times=[.4,.6,.7])
+    
+    N = 500 # choose a convenient number
+    fig = mne.viz.plot_events(events[:N,:], sfreq=raw.info['sfreq'], first_samp=raw.first_samp, event_id=new_evt_id)
+    
+    report.add_figure(fig_evt, title='events')
+    
+    report.save("/data/MEGLANG/MOUS/BIDS/derivatives/NIMHMEGCORE/" + sub_list[i] + ".html",open_browser=False,overwrite=True)
+
+mne.Epochs
