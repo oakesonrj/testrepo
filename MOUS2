@@ -60,7 +60,7 @@ for i in range(len(sub_list)):
         fig_joint = evoked[i].plot_joint(times=[.4,.6,.7])
         report.add_figure(fig_joint, title=titleList[i])#,n_time_points=10)
 
-    ev_combo = mne.combine_evoked([evoked[1], evoked[3]], weights= -1, 1])
+    ev_combo = mne.combine_evoked([evoked[1], evoked[3]], weights= [-1, 1])
     ev_combo.plot_joint(times=[.4,.6,.7])
     
     N = 500 # choose a convenient number
