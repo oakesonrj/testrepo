@@ -1,4 +1,4 @@
-###Correlation###
+### STATISTICS ###
 
 library(ggplot2) 
 library(dplyr) 
@@ -6,90 +6,22 @@ library(broom)
 library(ggpubr)
 library(tidyverse)
 library(AICcmodavg)
+library(lme4)
+library(lmerTest)
 
-#import data in .csv, make sure of headers
+###### LINEAR CORRELATION ######
 
-hist(data$variable) # for distribution of normality
+# Assuming 'data' is your dataset with columns 'x' and 'y', and you want to use specific columns
+selected_columns <- c("x", "y")  # Specify the columns you want to use
 
-plot(variable.y ~ variable.x, data =dataset) # for linearity
+# Plotting with the selected columns and adding a border
+ggplot(data, aes_string(x = selected_columns[1], y = selected_columns[2])) +
+  geom_point(color = "blue") +  # scatter plot
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # linear regression line without shaded confidence interval
+  labs(title = "Linear Regression Plot",
+       x = selected_columns[1],  # Using selected column names for axis labels
+       y = selected_columns[2]) +  # axis labels
+  theme_minimal() +  # minimal theme
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = "black", fill = NA, size = 1))  # Adding a border around the plot
 
-###mulitple regression### 
-cor(data$variable1, data$variable2) # for independence of observations
-
-#create linear model from data 
-title.lm <- lm(variable.y ~ variable.x, data = dataset) summary(title.lm) # for reportable stats
-
-#check of homoscedasticity 
-par(mfrow=c(2,2)) # make plots easier to view 
-plot(title.lm)
-
-#plotting
-title.data.graph <- ggplot(data, aes(x=x variable, y=y variable)) + geom_point() 
-title.data.graph <- title.data.graph + geom_smooth(method="lm", col="red")
-
-title.data.graph <- title.data.graph + stat_regline_equation(label.x = number, label.y = number)
-
-income.graph + theme_bw() + labs(title = "Graph Title", x = "x axis label", y = "y axis label")
-
-title.data.graph
-
-
-
-###Independent Sample T Test###
-t.test(y ~ x, var.equal=TRUE, data=dataset)
-
-
-
-
-###ANOVA###
-one.way <- aov(SRT ~ Group, data = ttest1)
-
-two.way <- aov(SRT ~ Group + Age, data = ttest1)
-interaction <- aov(SRT ~ Group*Age, data=ttest1)
-summary(interaction)
-
-##adding another variable: variable.3.name <- aov(variable.y ~ variable.x + variably.2 + variable.3, data = data)
-#summary(blocking)
-
-model.set <- list(one.way, two.way, interaction)
-model.names <- c("one.way", "two.way", "interaction")
-aictab(model.set, modnames = model.names)
-
-par(mfrow=c(2,2))
-plot(two.way)
-
-mean.y.variable.data <- .data %>%
-     group_by(variable.x, variable.z) %>%
-     summarize(
-         y.variable = mean(y)
-     )
-
-mean.y.data$group <- c("a","b","c","n")
-
-mean.y.data
-
-two.way.plot <- ggplot(data, aes(x = x.variable, y = y.variable, group=z.variable)) +
-  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0)) #+ xlim(n,n)
-
-two.way.plot
-
-two.way.plot <- two.way.plot +
-  stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
-  stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
-  geom_point(data=mean.y.variable.data, aes(x=x.variable, y=y.variable))
-
-two.way.plot
-
-two.way.plot <- two.way.plot +
-  geom_text(data=mean.y.variable.data, label=mean.y.variable.data$group, vjust = -8, size = 5) +
-  facet_wrap(~ z.variable)
-
-two.way.plot
-
-two.way.plot <- two.way.plot +
-  theme_classic2() +
-  labs(title = "Title",
-      x = "x label (1=..., 2=...)",
-      y = "Y label (...)")
-
-two.way.plot
