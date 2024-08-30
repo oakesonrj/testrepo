@@ -25,3 +25,33 @@ ggplot(data, aes_string(x = selected_columns[1], y = selected_columns[2])) +
   theme(plot.title = element_text(hjust = 0.5),
         panel.border = element_rect(color = "black", fill = NA, size = 1))  # Adding a border around the plot
 
+
+
+
+
+###### PRINCIPAL COMPONENT ANALYSIS W/ FACTOMINER ######
+
+# Load the necessary library
+library(FactoMineR)
+
+# Replace 'your_data.csv' with the actual name of your dataset file
+data <- read.csv("your_data.csv")
+
+# Ensure that the relevant columns are numeric
+# Assuming the variables of interest are in columns 1 to 6
+numeric_data <- data[,1:6]
+
+# Perform PCA
+result_pca <- PCA(numeric_data, scale.unit = TRUE, ncp = 6, graph = TRUE)
+
+# Print the summary of the PCA
+summary(result_pca)
+
+# Visualize the eigenvalues (Scree plot)
+plot(result_pca, choix = "var")
+
+# Visualize the individuals and variables on the first two dimensions (Biplot)
+plot(result_pca, choix = "ind")
+
+# Describe the dimensions with correlation and pvalues with chosen axes
+dimdesc(result_pca, axes=c(1,2,3))
