@@ -55,3 +55,33 @@ plot(result_pca, choix = "ind")
 
 # Describe the dimensions with correlation and pvalues with chosen axes
 dimdesc(result_pca, axes=c(1,2,3))
+
+# Eigenvalues and explained variance
+eigenvalues <- result_pca$eig
+print("Eigenvalues and Explained Variance:")
+print(eigenvalues)
+
+# Loadings of the variables
+loadings <- result_pca$var$coord
+print("Variable Loadings:")
+print(loadings)
+
+# Contributions of variables to each component
+contributions <- result_pca$var$contrib
+print("Contributions of Variables:")
+print(contributions)
+
+# Coordinates of individuals on the components
+scores <- result_pca$ind$coord
+print("Component Scores (Coordinates of Individuals):")
+print(scores)
+
+# Quality of representation for variables
+quality_var <- result_pca$var$cos2
+print("Quality of Representation for Variables (cos2):")
+print(quality_var)
+
+# Quality of representation for individuals
+quality_ind <- result_pca$ind$cos2
+print("Quality of Representation for Individuals (cos2):")
+print(quality_ind)
